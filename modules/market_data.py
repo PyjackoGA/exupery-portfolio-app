@@ -2,9 +2,11 @@
 market_data.py
 Récupération et mise en cache des données de marché via yfinance.
 Base de fallback hardcodée pour les ETFs européens.
+Version améliorée pour maximiser la prise en compte des ETFs.
 """
 
 import time
+import re
 import yfinance as yf
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -30,28 +32,68 @@ def _cache_set(key: str, data):
 # ─────────────────────────────────────────────────────────────────────────────
 _YF_SECTOR_MAP = {
     "technology":                  "Tech",
+    "information technology":      "Tech",
+    "software":                    "Tech",
+    "semiconductors":              "Tech",
+
     "financial services":          "Finance",
     "financials":                  "Finance",
+    "banks":                       "Finance",
+    "banking":                     "Finance",
+    "insurance":                   "Finance",
+    "capital markets":             "Finance",
+
     "healthcare":                  "Santé",
     "health care":                 "Santé",
+    "biotechnology":               "Santé",
+    "pharmaceuticals":             "Santé",
+    "medical devices":             "Santé",
+
     "consumer cyclical":           "Conso. Cycl.",
     "consumer discretionary":      "Conso. Cycl.",
+    "retail":                      "Conso. Cycl.",
+    "automobiles":                 "Conso. Cycl.",
+    "travel":                      "Conso. Cycl.",
+
     "communication services":      "Com",
+    "telecommunications":          "Com",
+    "telecom":                     "Com",
+    "media":                       "Com",
+    "internet content & information": "Com",
+
     "energy":                      "Énergie",
+    "oil & gas":                   "Énergie",
+
     "consumer defensive":          "Conso. Base",
     "consumer staples":            "Conso. Base",
+    "household & personal products": "Conso. Base",
+
     "industrials":                 "Industrie",
+    "industrial":                  "Industrie",
+    "aerospace & defense":         "Industrie",
+    "transportation":              "Industrie",
+
     "basic materials":             "Matériaux",
     "materials":                   "Matériaux",
+    "chemicals":                   "Matériaux",
+    "metals & mining":             "Matériaux",
+
     "utilities":                   "Services",
+
     "real estate":                 "Immo.",
+
     "cash":                        "Liquidités",
+    "money market":                "Liquidités",
+    "short government":            "Liquidités",
+
     "other":                       "Autres",
 }
 
 
 def _map_sector(raw: str) -> str:
-    return _YF_SECTOR_MAP.get(raw.lower().strip(), "Autres")
+    if not raw:
+        return "Autres"
+    return _YF_SECTOR_MAP.get(str(raw).lower().strip(), "Autres")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -199,6 +241,156 @@ BENCHMARK_LABELS = {
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Helpers robustes ETF
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _normalize_weights(weights: dict[str, float] | None) -> dict[str, float] | None:
+    """
+    Nettoie et renormalise un dictionnaire de poids.
+    Accepte des poids en décimal (0.25) ou parfois en % (25).
+    """
+    if not weights:
+        return None
+
+    cleaned = {}
+    for k, v in weights.items():
+        try:
+            val = float(v)
+            if val < 0:
+                continue
+            cleaned[k] = cleaned.get(k, 0.0) + val
+        except Exception:
+            continue
+
+    if not cleaned:
+        return None
+
+    total = sum(cleaned.values())
+    if total == 0:
+        return None
+
+    cleaned = {k: v / total for k, v in cleaned.items()}
+    return cleaned
+
+
+def _canon_ticker(ticker: str) -> str:
+    """
+    Forme canonique d'un ticker pour matching robuste :
+    - uppercase
+    - supprime suffixes de place (.PA, .AS, .L, .DE...)
+    - supprime ponctuation
+    """
+    t = (ticker or "").upper().strip()
+    t = re.sub(r"\.[A-Z]+$", "", t)
+    t = re.sub(r"[^A-Z0-9]", "", t)
+    return t
+
+
+def _build_db_aliases() -> dict[str, str]:
+    """
+    Construit une table d'alias à partir des tickers déjà présents dans ETF_SECTOR_DB.
+    """
+    aliases = {}
+    for original in ETF_SECTOR_DB.keys():
+        aliases[_canon_ticker(original)] = original
+    return aliases
+
+
+def _get_info_safe(ticker: str) -> dict:
+    """
+    Tente de récupérer t.info sans faire planter le flux.
+    """
+    try:
+        return yf.Ticker(ticker).info or {}
+    except Exception:
+        return {}
+
+
+ETF_DB_ALIASES = _build_db_aliases()
+
+ETF_PROXY_KEYWORDS = {
+    "URTH": [
+        "MSCI WORLD", "WORLD", "DEVELOPED WORLD", "GLOBAL EQUITY", "GLOBAL STOCK",
+        "CORE MSCI WORLD", "WORLD UCITS", "MSCI WORLD UCITS"
+    ],
+    "ACWI": [
+        "ACWI", "ALL COUNTRY WORLD", "ALL-WORLD", "FTSE ALL-WORLD",
+        "MSCI ACWI", "GLOBAL ALL CAP", "TOTAL WORLD"
+    ],
+    "SPY": [
+        "S&P 500", "SP500", "S&P500", "CORE S&P 500", "US LARGE CAP",
+        "USA LARGE CAP", "US LARGE BLEND"
+    ],
+    "VTI": [
+        "TOTAL MARKET", "TOTAL STOCK MARKET", "US TOTAL MARKET",
+        "BROAD MARKET", "US BROAD MARKET"
+    ],
+    "QQQ": [
+        "NASDAQ 100", "NASDAQ100", "NDX", "QQQ"
+    ],
+    "VGK": [
+        "MSCI EUROPE", "EUROPE", "STOXX EUROPE", "PAN EUROPE",
+        "EUROPE UCITS", "EUROPE LARGE CAP"
+    ],
+    "EZU": [
+        "EURO STOXX", "EUROZONE", "EMU"
+    ],
+    "EEM": [
+        "EMERGING", "EMERGENTS", "MSCI EM", "MSCI EMERGING", "EM"
+    ],
+    "XLK": ["TECHNOLOGY", "INFORMATION TECHNOLOGY", "TECH"],
+    "XLF": ["FINANCIAL", "FINANCE", "BANKS"],
+    "XLV": ["HEALTHCARE", "HEALTH CARE", "HEALTH"],
+    "XLE": ["ENERGY", "OIL", "GAS"],
+    "XLI": ["INDUSTRIAL", "INDUSTRIALS"],
+    "XLY": ["CONSUMER DISCRETIONARY", "CONSUMER CYCLICAL"],
+    "XLP": ["CONSUMER STAPLES", "CONSUMER DEFENSIVE"],
+    "XLB": ["MATERIALS", "BASIC MATERIALS"],
+    "XLU": ["UTILITIES"],
+    "XLRE": ["REAL ESTATE"],
+    "XLC": ["COMMUNICATION", "COMMUNICATION SERVICES", "TELECOM"],
+}
+
+
+def _infer_proxy_ticker(ticker: str, info: dict) -> str | None:
+    """
+    Essaie de trouver un ETF proxy à partir du ticker, du nom, de la catégorie, etc.
+    """
+    canon = _canon_ticker(ticker)
+
+    if canon in ETF_DB_ALIASES:
+        return ETF_DB_ALIASES[canon]
+
+    text_parts = [
+        info.get("longName", ""),
+        info.get("shortName", ""),
+        info.get("category", ""),
+        info.get("fundFamily", ""),
+        info.get("legalType", ""),
+    ]
+    blob = " ".join([str(x).upper() for x in text_parts if x])
+
+    for proxy, keywords in ETF_PROXY_KEYWORDS.items():
+        if any(k in blob for k in keywords):
+            return proxy
+
+    if any(x in canon for x in ["CW8", "EWLD", "IWDA", "SWDA", "WRD"]):
+        return "URTH"
+    if any(x in canon for x in ["ACWI", "VWCE", "VT"]):
+        return "ACWI"
+    if any(x in canon for x in ["SP5", "SXR8", "VUSA", "CSPX", "SPY", "VOO", "IVV"]):
+        return "SPY"
+    if any(x in canon for x in ["EEM", "VWO", "IEMA", "PAEEM"]):
+        return "EEM"
+    if any(x in canon for x in ["VGK", "IEUR", "IMEU", "MEUD"]):
+        return "VGK"
+    if any(x in canon for x in ["QQQ", "CNDX", "SXRV", "NDX"]):
+        return "QQQ"
+
+    return None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Fonctions principales
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -206,29 +398,38 @@ def get_ticker_info(ticker: str) -> dict:
     """
     Retourne les infos de base d'un ticker (nom, secteur, pays, type).
     Résultat mis en cache 1h.
+    Version plus robuste pour les ETFs.
     """
     key = f"info_{ticker}"
     cached = _cache_get(key)
     if cached:
         return cached
 
-    try:
-        t = yf.Ticker(ticker)
-        info = t.info
-        result = {
-            "ticker":  ticker,
-            "name":    info.get("longName") or info.get("shortName") or ticker,
-            "sector":  _map_sector(info.get("sector", "Autres")),
-            "country": info.get("country", "N/A"),
-            "type":    "ETF" if info.get("quoteType", "").upper() == "ETF" else "Action",
-            "valid":   True,
-        }
-    except Exception:
-        result = {
-            "ticker": ticker, "name": ticker,
-            "sector": "Autres", "country": "N/A",
-            "type": "Action", "valid": False,
-        }
+    info = _get_info_safe(ticker)
+
+    quote_type = str(info.get("quoteType", "")).upper()
+    long_name  = info.get("longName") or info.get("shortName") or ticker
+    raw_sector = info.get("sector", "Autres")
+    country    = info.get("country", "N/A")
+
+    canon = _canon_ticker(ticker)
+    inferred_proxy = _infer_proxy_ticker(ticker, info)
+
+    is_etf = (
+        quote_type in {"ETF", "MUTUALFUND", "INDEX"} or
+        canon in ETF_DB_ALIASES or
+        inferred_proxy is not None or
+        "ETF" in str(long_name).upper()
+    )
+
+    result = {
+        "ticker":  ticker,
+        "name":    long_name,
+        "sector":  _map_sector(raw_sector),
+        "country": country,
+        "type":    "ETF" if is_etf else "Action",
+        "valid":   bool(info) or canon in ETF_DB_ALIASES or inferred_proxy is not None,
+    }
 
     _cache_set(key, result)
     return result
@@ -237,18 +438,27 @@ def get_ticker_info(ticker: str) -> dict:
 def get_etf_sector_weights(ticker: str) -> dict[str, float] | None:
     """
     Retourne la décomposition sectorielle d'un ETF.
-    1. Cherche d'abord dans la base hardcodée.
-    2. Si absent, tente yfinance funds_data.
-    3. Retourne None si aucune décomposition disponible.
+    Ordre de priorité :
+    1. base hardcodée exacte
+    2. alias / ticker canonique
+    3. yfinance funds_data.sector_weightings
+    4. proxy déduit du nom/catégorie/ticker
+    5. None si rien de fiable
     """
-    # Base hardcodée en priorité
     if ticker in ETF_SECTOR_DB:
-        return ETF_SECTOR_DB[ticker]
+        return _normalize_weights(ETF_SECTOR_DB[ticker])
+
+    canon = _canon_ticker(ticker)
+    if canon in ETF_DB_ALIASES:
+        base_ticker = ETF_DB_ALIASES[canon]
+        return _normalize_weights(ETF_SECTOR_DB.get(base_ticker))
 
     key = f"etf_sectors_{ticker}"
     cached = _cache_get(key)
     if cached is not None:
         return cached
+
+    info = _get_info_safe(ticker)
 
     try:
         t = yf.Ticker(ticker)
@@ -256,12 +466,24 @@ def get_etf_sector_weights(ticker: str) -> dict[str, float] | None:
         if raw:
             weights = {}
             for sector_raw, w in raw.items():
-                mapped = _map_sector(sector_raw)
-                weights[mapped] = weights.get(mapped, 0.0) + float(w)
-            _cache_set(key, weights)
-            return weights
+                mapped = _map_sector(str(sector_raw))
+                try:
+                    weights[mapped] = weights.get(mapped, 0.0) + float(w)
+                except Exception:
+                    pass
+
+            weights = _normalize_weights(weights)
+            if weights:
+                _cache_set(key, weights)
+                return weights
     except Exception:
         pass
+
+    proxy = _infer_proxy_ticker(ticker, info)
+    if proxy and proxy in ETF_SECTOR_DB:
+        proxied = _normalize_weights(ETF_SECTOR_DB[proxy])
+        _cache_set(key, proxied)
+        return proxied
 
     _cache_set(key, None)
     return None
@@ -271,7 +493,6 @@ def get_price_history(ticker: str, period: str = "1y"):
     """
     Retourne l'historique de prix de clôture (pandas Series).
     """
-    import pandas as pd
     key = f"hist_{ticker}_{period}"
     cached = _cache_get(key)
     if cached is not None:
@@ -293,6 +514,7 @@ def get_price_history(ticker: str, period: str = "1y"):
 def build_portfolio_sectors(positions: list[dict]) -> dict[str, float]:
     """
     Construit la décomposition sectorielle du portefeuille en look-through.
+    Version plus robuste : renormalise les décompositions ETF et limite les pertes dans 'Autres'.
     """
     total = sum(p["amount"] for p in positions)
     if total == 0:
@@ -309,16 +531,19 @@ def build_portfolio_sectors(positions: list[dict]) -> dict[str, float]:
 
         if info["type"] == "ETF":
             etf_sectors = get_etf_sector_weights(ticker)
+
             if etf_sectors:
+                etf_sectors = _normalize_weights(etf_sectors)
                 for sector, sw in etf_sectors.items():
                     sector_totals[sector] = sector_totals.get(sector, 0.0) + weight * sw
             else:
                 sector_totals["Autres"] = sector_totals.get("Autres", 0.0) + weight
+
         else:
             sector = info["sector"]
             sector_totals[sector] = sector_totals.get(sector, 0.0) + weight
 
-    return sector_totals
+    return _normalize_weights(sector_totals) or {}
 
 
 def get_benchmark_sectors(benchmark_name: str) -> dict[str, float]:
@@ -328,5 +553,5 @@ def get_benchmark_sectors(benchmark_name: str) -> dict[str, float]:
     ticker = BENCHMARK_TICKERS.get(benchmark_name, "URTH")
     sectors = get_etf_sector_weights(ticker)
     if sectors:
-        return sectors
-    return ETF_SECTOR_DB["URTH"]
+        return _normalize_weights(sectors)
+    return _normalize_weights(ETF_SECTOR_DB["URTH"]) or {}
