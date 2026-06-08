@@ -1,0 +1,41 @@
+===================================================
+  EXUPERY — Diagnostiqueur de Portefeuille
+  Instructions de lancement
+===================================================
+
+1. INSTALLER PYTHON 3.12
+   https://www.python.org/downloads/
+   (cocher "Add Python to PATH" lors de l'installation)
+
+2. INSTALLER LES DEPENDANCES
+   Ouvrir un terminal (cmd ou PowerShell) dans ce dossier et lancer :
+
+      pip install streamlit yfinance plotly pandas numpy
+
+3. LANCER L'APPLICATION
+   Dans le même terminal :
+
+      python -m streamlit run app.py
+
+   Ou sous PowerShell (si problème d'encodage) :
+
+      $env:PYTHONUTF8=1
+      python -m streamlit run app.py
+
+4. L'application s'ouvre automatiquement dans le navigateur
+   à l'adresse : http://localhost:8501
+
+===================================================
+  STRUCTURE DES FICHIERS (ne pas modifier)
+===================================================
+
+  Export_Collegue/
+  ├── app.py
+  ├── LANCER_APP.txt        ← ce fichier
+  └── modules/
+      ├── __init__.py
+      ├── charts.py
+      ├── diagnostics.py
+      └── market_data.py
+
+===================================================
