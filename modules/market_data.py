@@ -308,9 +308,11 @@ def _get_info_safe(ticker: str) -> dict:
 
 ETF_DB_ALIASES = _build_db_aliases()
 
-# Alias manuels supplémentaires pour maximiser la reconnaissance
+# Alias manuels supplémentaires pour maximiser la reconnaissance - la base de yahoo finance est assez restreinte donc on maximise l'assimilation 
 ETF_DB_ALIASES.update({
-    # ── Monde développé / MSCI World ───────────────────────────────────────
+    # =========================
+    # MSCI WORLD / DEVELOPED WORLD
+    # =========================
     "CW8": "CW8.PA",
     "EWLD": "EWLD.PA",
     "WPEA": "WPEA.PA",
@@ -325,8 +327,15 @@ ETF_DB_ALIASES.update({
     "WRD": "URTH",
     "XDWL": "URTH",
     "IWRD": "IWRD.L",
+    "IWORLD": "URTH",
+    "MWRD": "URTH",
+    "DVRD": "URTH",
+    "WDMX": "URTH",
+    "DMWO": "URTH",
 
-    # ── All-World / ACWI / FTSE All-World ──────────────────────────────────
+    # =========================
+    # ACWI / ALL-WORLD / TOTAL WORLD
+    # =========================
     "ACWI": "ACWI",
     "VT": "VT",
     "IUSQ": "ACWI",
@@ -338,8 +347,18 @@ ETF_DB_ALIASES.update({
     "VWRP": "VT",
     "FWRA": "VT",
     "FWRG": "VT",
+    "AWRD": "ACWI",
+    "ALLW": "ACWI",
+    "WRLD": "ACWI",
+    "GLBL": "ACWI",
+    "ALLC": "ACWI",
+    "MSAC": "ACWI",
+    "XAWO": "ACWI",
+    "XAWR": "ACWI",
 
-    # ── S&P 500 / US Large Cap ─────────────────────────────────────────────
+    # =========================
+    # S&P 500 / US LARGE CAP
+    # =========================
     "SPY": "SPY",
     "IVV": "IVV",
     "VOO": "VOO",
@@ -353,14 +372,33 @@ ETF_DB_ALIASES.update({
     "SPXP": "SPY",
     "IUSE": "SPY",
     "G500": "SPY",
+    "SPX5": "SPY",
+    "SPXX": "SPY",
+    "SPPW": "SPY",
+    "SPXD": "SPY",
+    "SPXE": "SPY",
+    "SP5L": "SPY",
+    "SP5A": "SPY",
+    "500U": "SPY",
+    "US500": "SPY",
+    "SP500": "SPY",
 
-    # ── US Total Market / Broad US ─────────────────────────────────────────
+    # =========================
+    # US TOTAL MARKET / BROAD US
+    # =========================
     "VTI": "VTI",
     "ITOT": "VTI",
     "SCHB": "VTI",
     "IWV": "VTI",
+    "TMWR": "VTI",
+    "USTM": "VTI",
+    "BUSA": "VTI",
+    "USBR": "VTI",
+    "XTOT": "VTI",
 
-    # ── Nasdaq-100 ─────────────────────────────────────────────────────────
+    # =========================
+    # NASDAQ-100 / US MEGA GROWTH
+    # =========================
     "QQQ": "QQQ",
     "QQQM": "QQQ",
     "CNDX": "QQQ",
@@ -369,22 +407,107 @@ ETF_DB_ALIASES.update({
     "SXRV": "QQQ",
     "XNAS": "QQQ",
     "NQSE": "QQQ",
+    "CNX1": "QQQ",
+    "NASD": "QQQ",
+    "NDXU": "QQQ",
+    "USTQ": "QQQ",
+    "QQQS": "QQQ",
+    "NDQ": "QQQ",
 
-    # ── Europe / Eurozone ──────────────────────────────────────────────────
+    # =========================
+    # USA STYLE / FACTOR / BROAD PROXIES
+    # =========================
+    "VUG": "SPY",
+    "VTV": "SPY",
+    "IWF": "SPY",
+    "IWD": "SPY",
+    "IWB": "SPY",
+    "IWO": "SPY",
+    "IWN": "SPY",
+    "SCHG": "SPY",
+    "SCHV": "SPY",
+    "DGRO": "SPY",
+    "SCHD": "SPY",
+    "QUAL": "SPY",
+    "MTUM": "SPY",
+    "USMV": "SPY",
+    "SIZE": "SPY",
+    "VLUE": "SPY",
+    "SPLV": "SPY",
+    "RPV": "SPY",
+    "RPG": "SPY",
+    "VBR": "SPY",
+    "VBK": "SPY",
+    "VB": "SPY",
+    "IJR": "SPY",
+    "IWM": "SPY",
+    "VTWO": "SPY",
+    "IJS": "SPY",
+    "IJT": "SPY",
+    "IUSV": "SPY",
+    "IUSG": "SPY",
+    "FNDX": "SPY",
+    "DGRW": "SPY",
+    "NOBL": "SPY",
+    "SPYG": "SPY",
+    "SPYV": "SPY",
+    "SPTM": "SPY",
+    "ONEQ": "QQQ",
+
+    # =========================
+    # EUROPE / PAN-EUROPE
+    # =========================
     "VGK": "VGK",
     "IEUR": "IEUR",
-    "EZU": "EZU",
     "IMEU": "VGK",
     "MEUD": "VGK",
-    "ESE": "ESE.PA",
-    "LYXEL": "LYXEL.PA",
     "MSE": "VGK",
     "EUNK": "VGK",
-    "FEZ": "EZU",
     "EXSA": "VGK",
     "IEUX": "VGK",
+    "HEDJ": "VGK",
+    "ESE": "ESE.PA",
+    "LYXEL": "LYXEL.PA",
+    "STXE": "VGK",
+    "EURO": "VGK",
+    "PEU": "VGK",
+    "EURL": "VGK",
+    "EROX": "VGK",
+    "EUX": "VGK",
 
-    # ── Émergents ──────────────────────────────────────────────────────────
+    # =========================
+    # EUROZONE / EMU
+    # =========================
+    "EZU": "EZU",
+    "FEZ": "EZU",
+    "CSEMU": "EZU",
+    "EMU": "EZU",
+    "EUE": "EZU",
+    "EZON": "EZU",
+    "EMUX": "EZU",
+
+    # =========================
+    # UK / JAPAN / SWITZERLAND / DEV. EX-US
+    # =========================
+    "EWU": "VGK",
+    "ISF": "VGK",
+    "CUKX": "VGK",
+    "EWJ": "URTH",
+    "DXJ": "URTH",
+    "JPXN": "URTH",
+    "HEWJ": "URTH",
+    "CSJP": "URTH",
+    "EWGS": "URTH",
+    "EWL": "VGK",
+    "CHSPI": "VGK",
+    "VEA": "URTH",
+    "IDEV": "URTH",
+    "SCHF": "URTH",
+    "IEFA": "URTH",
+
+    # =========================
+    # EMERGING MARKETS / EM BROAD
+    # =========================
     "EEM": "EEM",
     "VWO": "VWO",
     "PAEEM": "PAEEM.PA",
@@ -397,104 +520,213 @@ ETF_DB_ALIASES.update({
     "XMME": "EEM",
     "CSEM": "EEM",
     "XCS6": "EEM",
+    "EEMS": "EEM",
+    "SPEM": "EEM",
+    "IEMG": "EEM",
+    "XCEM": "EEM",
+    "EMXC": "EEM",
+    "EMKT": "EEM",
+    "EMBROAD": "EEM",
 
-    # ── Japon / Asie / Chine / Inde (proxy World ou EM) ───────────────────
-    "EWJ": "URTH",
-    "DXJ": "URTH",
-    "JPXN": "URTH",
-    "AAXJ": "EEM",
+    # =========================
+    # CHINA / INDIA / ASIA / LATAM / COUNTRY PROXIES
+    # =========================
     "FXI": "EEM",
     "MCHI": "EEM",
     "KWEB": "EEM",
     "ASHR": "EEM",
+    "PGJ": "EEM",
+    "CQQQ": "EEM",
+    "GXC": "EEM",
+    "CNXT": "EEM",
     "INDA": "EEM",
     "SMIN": "EEM",
     "EPI": "EEM",
-    "CNX1": "EEM",
+    "PIN": "EEM",
+    "INDY": "EEM",
+    "AAXJ": "EEM",
+    "GMF": "EEM",
+    "EWY": "EEM",
+    "EWT": "EEM",
+    "EWH": "EEM",
+    "EWS": "EEM",
+    "EWM": "EEM",
+    "EPHE": "EEM",
+    "THD": "EEM",
+    "EIDO": "EEM",
+    "IDX": "EEM",
+    "ILF": "EEM",
+    "EWW": "EEM",
+    "EWZ": "EEM",
+    "ARGT": "EEM",
+    "ECH": "EEM",
+    "GXG": "EEM",
+    "TUR": "EEM",
+    "GREK": "EEM",
+    "RSX": "EEM",
+    "ERUS": "EEM",
+    "EZA": "EEM",
+    "NGE": "EEM",
 
-    # ── Small caps / style / factors (proxy broad market) ─────────────────
-    "IJR": "SPY",
-    "IWM": "SPY",
-    "VTWO": "SPY",
-    "VB": "SPY",
-    "VUG": "SPY",
-    "VTV": "SPY",
-    "IWF": "SPY",
-    "IWD": "SPY",
-    "QUAL": "SPY",
-    "MTUM": "SPY",
-    "USMV": "SPY",
-    "SIZE": "SPY",
-    "VLUE": "SPY",
-    "DGRO": "SPY",
-    "SCHD": "SPY",
-
-    # ── Sectoriels US : Tech ───────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — TECHNOLOGY
+    # =========================
     "XLK": "XLK",
     "VGT": "XLK",
     "IYW": "XLK",
     "RYT": "XLK",
+    "FTEC": "XLK",
+    "IGM": "XLK",
+    "SOXX": "XLK",
+    "SMH": "XLK",
+    "PSI": "XLK",
 
-    # ── Finance ────────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — FINANCIALS
+    # =========================
     "XLF": "XLF",
     "VFH": "XLF",
     "IYF": "XLF",
     "KRE": "XLF",
+    "KBE": "XLF",
+    "IAI": "XLF",
+    "FNCL": "XLF",
 
-    # ── Santé ──────────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — HEALTHCARE
+    # =========================
     "XLV": "XLV",
     "VHT": "XLV",
     "IYH": "XLV",
     "IBB": "XLV",
     "XBI": "XLV",
+    "FHLC": "XLV",
+    "PPH": "XLV",
 
-    # ── Conso cyclique ─────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — CONSUMER DISCRETIONARY
+    # =========================
     "XLY": "XLY",
     "VCR": "XLY",
     "RTH": "XLY",
     "PEJ": "XLY",
+    "FXD": "XLY",
 
-    # ── Communication ──────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — COMMUNICATION
+    # =========================
     "XLC": "XLC",
     "VOX": "XLC",
     "IYZ": "XLC",
+    "FCOM": "XLC",
 
-    # ── Énergie ────────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — ENERGY
+    # =========================
     "XLE": "XLE",
     "VDE": "XLE",
     "IYE": "XLE",
     "OIH": "XLE",
     "XOP": "XLE",
+    "IXC": "XLE",
+    "FENY": "XLE",
 
-    # ── Conso de base ──────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — CONSUMER STAPLES
+    # =========================
     "XLP": "XLP",
     "VDC": "XLP",
     "IYK": "XLP",
+    "KXI": "XLP",
+    "FSTA": "XLP",
 
-    # ── Industrie ──────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — INDUSTRIALS
+    # =========================
     "XLI": "XLI",
     "VIS": "XLI",
     "IYJ": "XLI",
     "ITA": "XLI",
     "PAVE": "XLI",
+    "RGI": "XLI",
+    "FIDU": "XLI",
 
-    # ── Matériaux ──────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — MATERIALS
+    # =========================
     "XLB": "XLB",
     "VAW": "XLB",
     "IYM": "XLB",
     "PICK": "XLB",
+    "MXI": "XLB",
+    "FMAT": "XLB",
 
-    # ── Utilities / Services ───────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — UTILITIES
+    # =========================
     "XLU": "XLU",
     "VPU": "XLU",
     "IDU": "XLU",
+    "JXI": "XLU",
+    "FUTY": "XLU",
 
-    # ── Immobilier ─────────────────────────────────────────────────────────
+    # =========================
+    # SECTOR ETFs — REAL ESTATE
+    # =========================
     "XLRE": "XLRE",
     "VNQ": "XLRE",
     "IYR": "XLRE",
     "REET": "XLRE",
+    "SCHH": "XLRE",
+    "RWR": "XLRE",
+    "USRT": "XLRE",
+
+    # =========================
+    # THEMATIC / CLEAN TECH / ROBOTICS / AI / CLOUD
+    # proxifiés vers Tech ou broad market
+    # =========================
+    "BOTZ": "XLK",
+    "ROBO": "XLK",
+    "ARKK": "XLK",
+    "ARKW": "XLK",
+    "ARKQ": "XLK",
+    "SKYY": "XLK",
+    "WCLD": "XLK",
+    "CLOU": "XLK",
+    "AIQ": "XLK",
+    "IRBO": "XLK",
+    "ICLN": "XLI",
+    "INRG": "XLI",
+    "LIT": "XLB",
+    "BATT": "XLB",
+    "DRIV": "XLY",
+    "HERO": "XLC",
+
+    # =========================
+    # REITS / PROPERTY GLOBAL
+    # =========================
+    "REET": "XLRE",
+    "GLRE": "XLRE",
+    "VNQI": "XLRE",
+    "IFGL": "XLRE",
+
+    # =========================
+    # DIVIDEND / QUALITY / LOW VOL UCITS-LIKE
+    # broad market proxies
+    # =========================
+    "FUSD": "SPY",
+    "SPYD": "SPY",
+    "VHYL": "VT",
+    "VYMI": "VT",
+    "HDV": "SPY",
+    "DVY": "SPY",
+    "SDY": "SPY",
+    "IDV": "VT",
+    "DEM": "EEM",
+    "QDVG": "SPY",
+    "QDVX": "SPY",
 })
+
 ETF_PROXY_KEYWORDS = {
     "URTH": [
         "MSCI WORLD", "WORLD", "DEVELOPED WORLD", "GLOBAL EQUITY", "GLOBAL STOCK",
