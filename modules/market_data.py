@@ -308,49 +308,188 @@ def _get_info_safe(ticker: str) -> dict:
 
 ETF_DB_ALIASES = _build_db_aliases()
 
+# Alias manuels supplémentaires pour maximiser la reconnaissance
+ETF_DB_ALIASES.update({
+    # ── Monde / Developed World ────────────────────────────────────────────
+    "CW8": "CW8.PA",
+    "EWLD": "EWLD.PA",
+    "WPEA": "WPEA.PA",
+    "IWDA": "URTH",
+    "SWDA": "URTH",
+    "LCWD": "URTH",
+    "XDWD": "URTH",
+    "EUNL": "URTH",
+    "WRD": "URTH",
+    "IWRD": "IWRD.L",
+    "XMAW": "URTH",
+
+    # ── All-World / ACWI ───────────────────────────────────────────────────
+    "ACWI": "ACWI",
+    "VT": "VT",
+    "VWCE": "VT",
+    "VWRL": "VT",
+    "SSAC": "ACWI",
+    "ISAC": "ACWI",
+    "XMAWALL": "ACWI",
+
+    # ── S&P 500 / US Large Cap ─────────────────────────────────────────────
+    "SPY": "SPY",
+    "IVV": "IVV",
+    "VOO": "VOO",
+    "SXR8": "SPY",
+    "CSPX": "SPY",
+    "VUSA": "SPY",
+    "VUAA": "SPY",
+    "SP5": "SPY",
+    "SPYL": "SPY",
+    "SPPW": "SPY",
+    "CSSPX": "SPY",
+
+    # ── US Total Market ────────────────────────────────────────────────────
+    "VTI": "VTI",
+    "ITOT": "VTI",
+    "SCHB": "VTI",
+
+    # ── Nasdaq 100 ─────────────────────────────────────────────────────────
+    "QQQ": "QQQ",
+    "QQQM": "QQQ",
+    "CNDX": "QQQ",
+    "SXRV": "QQQ",
+    "EQQQ": "QQQ",
+    "CSNDX": "QQQ",
+
+    # ── Europe ─────────────────────────────────────────────────────────────
+    "VGK": "VGK",
+    "IEUR": "IEUR",
+    "EZU": "EZU",
+    "IMEU": "VGK",
+    "MEUD": "VGK",
+    "ESE": "ESE.PA",
+    "LYXEL": "LYXEL.PA",
+
+    # ── Emerging Markets ───────────────────────────────────────────────────
+    "EEM": "EEM",
+    "VWO": "VWO",
+    "IEMA": "EEM",
+    "EMIM": "EEM",
+    "VFEM": "EEM",
+    "PAEEM": "PAEEM.PA",
+
+    # ── Japan / Asia / China / India (proxy émergents ou développés) ─────
+    "EWJ": "URTH",
+    "DXJ": "URTH",
+    "JPXN": "URTH",
+    "AAXJ": "EEM",
+    "FXI": "EEM",
+    "MCHI": "EEM",
+    "KWEB": "EEM",
+    "ASHR": "EEM",
+    "INDA": "EEM",
+    "SMIN": "EEM",
+    "EPI": "EEM",
+
+    # ── Sectoriels US ──────────────────────────────────────────────────────
+    "XLK": "XLK",
+    "VGT": "XLK",
+    "IYW": "XLK",
+
+    "XLF": "XLF",
+    "VFH": "XLF",
+    "IYF": "XLF",
+
+    "XLV": "XLV",
+    "VHT": "XLV",
+    "IYH": "XLV",
+
+    "XLY": "XLY",
+    "VCR": "XLY",
+    "RTH": "XLY",
+
+    "XLC": "XLC",
+    "VOX": "XLC",
+    "IYZ": "XLC",
+
+    "XLE": "XLE",
+    "VDE": "XLE",
+    "IYE": "XLE",
+
+    "XLP": "XLP",
+    "VDC": "XLP",
+    "IYK": "XLP",
+
+    "XLI": "XLI",
+    "VIS": "XLI",
+    "IYJ": "XLI",
+
+    "XLB": "XLB",
+    "VAW": "XLB",
+    "IYM": "XLB",
+
+    "XLU": "XLU",
+    "VPU": "XLU",
+    "IDU": "XLU",
+
+    "XLRE": "XLRE",
+    "VNQ": "XLRE",
+    "IYR": "XLRE",
+
+    # ── Value / Growth / factors (proxy broad market) ─────────────────────
+    "VUG": "SPY",
+    "VTV": "SPY",
+    "IWF": "SPY",
+    "IWD": "SPY",
+    "QUAL": "SPY",
+    "MTUM": "SPY",
+    "USMV": "SPY",
+    "SIZE": "SPY",
+    "VLUE": "SPY",
+})
+
 ETF_PROXY_KEYWORDS = {
     "URTH": [
         "MSCI WORLD", "WORLD", "DEVELOPED WORLD", "GLOBAL EQUITY", "GLOBAL STOCK",
-        "CORE MSCI WORLD", "WORLD UCITS", "MSCI WORLD UCITS"
+        "CORE MSCI WORLD", "WORLD UCITS", "MSCI WORLD UCITS",
+        "WORLD INDEX", "DEVELOPED MARKETS", "MSCI DM", "FTSE DEVELOPED"
     ],
     "ACWI": [
         "ACWI", "ALL COUNTRY WORLD", "ALL-WORLD", "FTSE ALL-WORLD",
-        "MSCI ACWI", "GLOBAL ALL CAP", "TOTAL WORLD"
+        "MSCI ACWI", "GLOBAL ALL CAP", "TOTAL WORLD", "ALL COUNTRY", "ALL WORLD"
     ],
     "SPY": [
         "S&P 500", "SP500", "S&P500", "CORE S&P 500", "US LARGE CAP",
-        "USA LARGE CAP", "US LARGE BLEND"
+        "USA LARGE CAP", "US LARGE BLEND", "SPDR S&P 500", "S&P UCITS"
     ],
     "VTI": [
         "TOTAL MARKET", "TOTAL STOCK MARKET", "US TOTAL MARKET",
-        "BROAD MARKET", "US BROAD MARKET"
+        "BROAD MARKET", "US BROAD MARKET", "TOTAL US MARKET"
     ],
     "QQQ": [
-        "NASDAQ 100", "NASDAQ100", "NDX", "QQQ"
+        "NASDAQ 100", "NASDAQ100", "NDX", "QQQ", "NASDAQ-100"
     ],
     "VGK": [
         "MSCI EUROPE", "EUROPE", "STOXX EUROPE", "PAN EUROPE",
-        "EUROPE UCITS", "EUROPE LARGE CAP"
+        "EUROPE UCITS", "EUROPE LARGE CAP", "EUROPE EQUITY"
     ],
     "EZU": [
-        "EURO STOXX", "EUROZONE", "EMU"
+        "EURO STOXX", "EUROZONE", "EMU", "EURO AREA"
     ],
     "EEM": [
-        "EMERGING", "EMERGENTS", "MSCI EM", "MSCI EMERGING", "EM"
+        "EMERGING", "EMERGENTS", "MSCI EM", "MSCI EMERGING", "EM",
+        "EMERGING MARKETS", "EMERGING MARKET", "CHINA", "INDIA", "ASIA EX JAPAN"
     ],
-    "XLK": ["TECHNOLOGY", "INFORMATION TECHNOLOGY", "TECH"],
-    "XLF": ["FINANCIAL", "FINANCE", "BANKS"],
-    "XLV": ["HEALTHCARE", "HEALTH CARE", "HEALTH"],
-    "XLE": ["ENERGY", "OIL", "GAS"],
-    "XLI": ["INDUSTRIAL", "INDUSTRIALS"],
-    "XLY": ["CONSUMER DISCRETIONARY", "CONSUMER CYCLICAL"],
-    "XLP": ["CONSUMER STAPLES", "CONSUMER DEFENSIVE"],
-    "XLB": ["MATERIALS", "BASIC MATERIALS"],
-    "XLU": ["UTILITIES"],
-    "XLRE": ["REAL ESTATE"],
-    "XLC": ["COMMUNICATION", "COMMUNICATION SERVICES", "TELECOM"],
-}
 
+    "XLK": ["TECHNOLOGY", "INFORMATION TECHNOLOGY", "TECH", "DIGITAL", "SOFTWARE", "SEMICONDUCTOR"],
+    "XLF": ["FINANCIAL", "FINANCE", "BANKS", "INSURANCE", "FINANCIAL SERVICES"],
+    "XLV": ["HEALTHCARE", "HEALTH CARE", "HEALTH", "BIOTECH", "PHARMA"],
+    "XLE": ["ENERGY", "OIL", "GAS"],
+    "XLI": ["INDUSTRIAL", "INDUSTRIALS", "AEROSPACE", "TRANSPORT"],
+    "XLY": ["CONSUMER DISCRETIONARY", "CONSUMER CYCLICAL", "RETAIL", "AUTOMOBILE"],
+    "XLP": ["CONSUMER STAPLES", "CONSUMER DEFENSIVE", "STAPLES"],
+    "XLB": ["MATERIALS", "BASIC MATERIALS", "CHEMICALS", "MINING"],
+    "XLU": ["UTILITIES", "UTILITY"],
+    "XLRE": ["REAL ESTATE", "REIT", "PROPERTY"],
+    "XLC": ["COMMUNICATION", "COMMUNICATION SERVICES", "TELECOM", "MEDIA"],
+}
 
 def _infer_proxy_ticker(ticker: str, info: dict) -> str | None:
     """
@@ -358,37 +497,93 @@ def _infer_proxy_ticker(ticker: str, info: dict) -> str | None:
     """
     canon = _canon_ticker(ticker)
 
+    # 1) matching direct via alias DB
     if canon in ETF_DB_ALIASES:
         return ETF_DB_ALIASES[canon]
 
+    # 2) matching sur nom / catégorie / family
     text_parts = [
         info.get("longName", ""),
         info.get("shortName", ""),
         info.get("category", ""),
         info.get("fundFamily", ""),
         info.get("legalType", ""),
+        info.get("fundInceptionDate", ""),
     ]
     blob = " ".join([str(x).upper() for x in text_parts if x])
 
+    # 3) matching heuristique par mots-clés
     for proxy, keywords in ETF_PROXY_KEYWORDS.items():
         if any(k in blob for k in keywords):
             return proxy
 
-    if any(x in canon for x in ["CW8", "EWLD", "IWDA", "SWDA", "WRD"]):
+    # 4) heuristiques ticker ultra larges
+    if any(x in canon for x in [
+        "CW8", "EWLD", "IWDA", "SWDA", "WRD", "LCWD", "EUNL", "WPEA", "XDWD", "IWRD"
+    ]):
         return "URTH"
-    if any(x in canon for x in ["ACWI", "VWCE", "VT"]):
+
+    if any(x in canon for x in [
+        "ACWI", "VWCE", "VWRL", "VT", "ISAC", "SSAC"
+    ]):
         return "ACWI"
-    if any(x in canon for x in ["SP5", "SXR8", "VUSA", "CSPX", "SPY", "VOO", "IVV"]):
+
+    if any(x in canon for x in [
+        "SP5", "SXR8", "VUSA", "VUAA", "CSPX", "SPY", "VOO", "IVV", "SPYL", "CSSPX"
+    ]):
         return "SPY"
-    if any(x in canon for x in ["EEM", "VWO", "IEMA", "PAEEM"]):
-        return "EEM"
-    if any(x in canon for x in ["VGK", "IEUR", "IMEU", "MEUD"]):
-        return "VGK"
-    if any(x in canon for x in ["QQQ", "CNDX", "SXRV", "NDX"]):
+
+    if any(x in canon for x in [
+        "VTI", "ITOT", "SCHB"
+    ]):
+        return "VTI"
+
+    if any(x in canon for x in [
+        "QQQ", "QQQM", "CNDX", "SXRV", "EQQQ", "CSNDX", "NDX"
+    ]):
         return "QQQ"
 
-    return None
+    if any(x in canon for x in [
+        "VGK", "IEUR", "IMEU", "MEUD", "ESE", "LYXEL", "EZU"
+    ]):
+        return "VGK"
 
+    if any(x in canon for x in [
+        "EEM", "VWO", "IEMA", "EMIM", "VFEM", "PAEEM", "INDA", "FXI", "MCHI", "KWEB", "ASHR", "AAXJ"
+    ]):
+        return "EEM"
+
+    # Sectoriels
+    if any(x in canon for x in ["XLK", "VGT", "IYW"]):
+        return "XLK"
+    if any(x in canon for x in ["XLF", "VFH", "IYF"]):
+        return "XLF"
+    if any(x in canon for x in ["XLV", "VHT", "IYH"]):
+        return "XLV"
+    if any(x in canon for x in ["XLY", "VCR", "RTH"]):
+        return "XLY"
+    if any(x in canon for x in ["XLC", "VOX", "IYZ"]):
+        return "XLC"
+    if any(x in canon for x in ["XLE", "VDE", "IYE"]):
+        return "XLE"
+    if any(x in canon for x in ["XLP", "VDC", "IYK"]):
+        return "XLP"
+    if any(x in canon for x in ["XLI", "VIS", "IYJ"]):
+        return "XLI"
+    if any(x in canon for x in ["XLB", "VAW", "IYM"]):
+        return "XLB"
+    if any(x in canon for x in ["XLU", "VPU", "IDU"]):
+        return "XLU"
+    if any(x in canon for x in ["XLRE", "VNQ", "IYR"]):
+        return "XLRE"
+
+    # ETF style / factor -> broad US proxy
+    if any(x in canon for x in [
+        "VUG", "VTV", "IWF", "IWD", "QUAL", "MTUM", "USMV", "SIZE", "VLUE"
+    ]):
+        return "SPY"
+
+    return None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Fonctions principales
